@@ -1,17 +1,26 @@
-type UserAction = 
-    | { type: 'LOGIN'; user: string }
-    | { type: 'LOGOUT' };
+export interface UserState {
+    isAuthenticated: boolean;
+    email: string;
+}
 
-type UserState = {
-    user: string | null;
-};
+export type UserAction =
+    | { type: 'LOGIN'; payload: string }
+    | { type: 'LOGOUT' };
 
 export const userReducer = (state: UserState, action: UserAction): UserState => {
     switch (action.type) {
         case 'LOGIN':
-            return { ...state, user: action.user };
+            return {
+                ...state,
+                isAuthenticated: true,
+                email: action.payload,
+            };
         case 'LOGOUT':
-            return { ...state, user: null };
+            return {
+                ...state,
+                isAuthenticated: false,
+                email: '',
+            };
         default:
             return state;
     }

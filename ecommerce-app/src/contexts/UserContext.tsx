@@ -1,36 +1,47 @@
 import React, { createContext, useReducer, ReactNode } from 'react';
-import { userReducer } from '../reducer/userReducer'
 
-type UserContextType = {
+interface UserState {
+    isAuthenticated: boolean;
     user: string | null;
+}
+
+interface UserContextProps {
+    state: UserState;
     login: (user: string) => void;
     logout: () => void;
+}
+
+const initialState: UserState = { isAuthenticated: false, user: null };
+
+const userReducer = (state: UserState, action: { type: string; payload?: string }): UserState => {
+    switch (action.type) {
+        case 'LOGIN':
+            return { ...state, isAuthenticated: true, user: action.payload || null };
+        case 'LOGOUT':
+            return { ...state, isAuthenticated: false, user: null };
+        default:
+            return state;
+    }
 };
 
-const initialUserState = {
-    user: null,
-};
+export const UserContext = createContext<UserContextProps | undefined>(undefined);
 
-export const UserContext = createContext<UserContextType | undefined>(undefined);
-
-export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-    const [userState, userDispatch] = useReducer(userReducer, initialUserState);
+const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+    const [state, dispatch] = useReducer(userReducer, initialState);
 
     const login = (user: string) => {
-        userDispatch({ type: 'LOGIN', user });
+        dispatch({ type: 'LOGIN', payload: user });
     };
 
     const logout = () => {
-        userDispatch({ type: 'LOGOUT' });
+        dispatch({ type: 'LOGOUT' });
     };
 
     return (
-        <UserContext.Provider value={{ 
-            user: userState.user, 
-            login, 
-            logout 
-        }}>
+        <UserContext.Provider value={{ state, login, logout }}>
             {children}
         </UserContext.Provider>
     );
 };
+
+export default UserProvider;

@@ -11,6 +11,7 @@ function RouteContainer() {
         <Route path="/" element={<HomePage />} />
         <Route path="/cart" element={<CartPage />} />
         <Route path="/signIn" element={<SignInPage />} />
+        <Route path="/logIn" element={<LoginPage />} />
         {/* <Route path="/product/:id" element={<ProductDetails product={{ name: '', description: '', price: 0, category: '', availability: '' }} />} /> */}
         {/* <Route path="/product/:id" element={<ProductPage />} />
         <Route path="/cart" element={<CartPage />} />
