@@ -1,5 +1,5 @@
 import React, { useState, useContext, useEffect } from 'react';
-import { Steps, Button, message, DatePicker, Card, InputNumber } from 'antd';
+import { Steps, Button, message, DatePicker, Card, InputNumber, Modal } from 'antd';
 import 'antd/dist/antd';
 import 'tailwindcss/tailwind.css';
 import EventIcon from '@mui/icons-material/Event';
@@ -12,9 +12,12 @@ import LocalShippingIcon from '@mui/icons-material/LocalShipping';
 import ElectricCarIcon from '@mui/icons-material/ElectricCar';
 import SportsMotorsportsIcon from '@mui/icons-material/SportsMotorsports';
 import { BasketContext } from '../contexts/BasketContext';
+import { UserContext } from '../contexts/UserContext';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import { format, parseISO, isBefore, isAfter, addHours, isEqual } from 'date-fns';
+import LoginPage from './LoginPage'; // Import the LoginPage component
+import LoginForm from '../components/LoginForm';
 
 const { Step } = Steps;
 const { Meta } = Card;
@@ -71,11 +74,20 @@ const CartPage: React.FC = () => {
     const [dateTime, setDateTime] = useState<Date | null>(null);
     const [duration, setDuration] = useState<number>(2); // Default duration is 2 hours
     const [bookings, setBookings] = useState<Booking[]>([]); // List of all bookings
+    const [isLoginModalVisible, setIsLoginModalVisible] = useState(false);
     const basketContext = useContext(BasketContext);
+    const userContext = useContext(UserContext);
+
     if (!basketContext) {
         throw new Error('BasketContext must be used within a BasketProvider');
     }
+
+    if (!userContext) {
+        throw new Error('UserContext must be used within a UserProvider');
+    }
+
     const { addToBasket } = basketContext;
+    const { user, login } = userContext;
 
     useEffect(() => {
         // Fetch bookings from backend or context
@@ -135,6 +147,11 @@ const CartPage: React.FC = () => {
     };
 
     const addToCart = () => {
+        if (!user) {
+            setIsLoginModalVisible(true);
+            return;
+        }
+
         if (vehicleType && dateTime && duration) {
             if (!isAvailable(vehicleType.id, dateTime, duration)) {
                 message.error('The selected vehicle is not available at the chosen time');
@@ -301,6 +318,17 @@ const CartPage: React.FC = () => {
                     )}
                 </div>
             </div>
+            <Modal
+                title="Login"
+                visible={isLoginModalVisible}
+                onCancel={() => setIsLoginModalVisible(false)}
+                footer={null}
+            >
+                <LoginForm onLoginSuccess={(username: string) => {
+                    login(username);
+                    setIsLoginModalVisible(false);
+                }} />
+            </Modal>
         </div>
     );
 };
