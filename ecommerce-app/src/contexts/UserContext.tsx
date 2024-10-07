@@ -7,6 +7,7 @@ interface UserState {
 
 interface UserContextProps {
     state: UserState;
+    user: string | null;
     login: (user: string) => void;
     logout: () => void;
 }
@@ -38,7 +39,7 @@ const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     };
 
     return (
-        <UserContext.Provider value={{ state, login, logout }}>
+        <UserContext.Provider value={{ state, user: state.user, login, logout }}>
             {children}
         </UserContext.Provider>
     );
